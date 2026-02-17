@@ -1,0 +1,41 @@
+# Ignore Python cache files
+__pycache__/
+*.pyc
+
+# Ignore Dataset folders 
+dataset_v1_original/
+dataset_improved_v2/
+output_squares/
+real_data_pack/
+synthetic_dataset_v1/
+zips/
+c06/
+experiment_fast/
+synthetic_dataset_color/
+chessred2k_data/
+PGN_data/
+annora
+venv/
+ft_chessred/
+ft_regular/
+ft_chessred_10k/
+ft_chessred_15k/
+ft_chessred_20k/
+ft_chessred_50k/
+experiment_multihead_fair/
+experiment_base_optimized/
+experiment_base_optimized_finetuned/
+experiment_triplet_3_check/
+experiment_triplet_3_check_finetuned/
+
+
+
+
+# Ignore large renders
+renders/
+*.png
+*.jpg
+*.zip
+*.pt
+# Ignore system files
+.DS_Store
