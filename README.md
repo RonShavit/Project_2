@@ -24,21 +24,21 @@
 
 >
 
->run (to unzip the files)
+>run (to unzip the files):
 
->>unzip experiment_base_optimized_finetuned.zip
+>>`unzip experiment_base_optimized_finetuned.zip`
 
->>unzip experiment_base_optimized.zip
+>>`unzip experiment_base_optimized.zip`
 
->>unzip synthetic_dataset_color.zip
+>>`unzip synthetic_dataset_color.zip`
 
->>unzip synthetic_dataset_extra1.zip
+>>`unzip synthetic_dataset_extra1.zip`
 
->>unzip synthetic_dataset_v1.zip
+>>`unzip synthetic_dataset_v1.zip`
 
->>unzip test_data_set
+>>`unzip test_data_set.zip`
 
->>unzip real_data_pack
+>>`unzip real_data_pack.zip`
 
 >**The final setup folder should look like:**
 
