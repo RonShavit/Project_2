@@ -17,16 +17,12 @@ from sklearn.metrics import confusion_matrix, accuracy_score
 
 
 
-# ============================================================
-# 1. GLOBAL MODEL CACHE
-# ============================================================
+
 _CACHED_MODEL = None
 _DEVICE = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 
-# ============================================================
-# 2. MODEL DEFINITION
-# ============================================================
+
 class MultiHeadResNet(nn.Module):
     def __init__(self, device="cpu", embed_dim=128):
         super().__init__()
@@ -40,7 +36,7 @@ class MultiHeadResNet(nn.Module):
         self.backbone = nn.Sequential(*list(base_model.children())[:-1])
         feature_size = base_model.fc.in_features
 
-        # Embedding head (required for weight loading)
+        # Embedding head 
         self.embedding_head = nn.Sequential(
             nn.Flatten(),
             nn.Linear(feature_size, 512),
@@ -76,9 +72,6 @@ class MultiHeadResNet(nn.Module):
         return self.type_head(features), self.color_head(features), embedding
 
 
-# ============================================================
-# 3. MODEL LOADING 
-# ============================================================
 def _load_model_once():
     global _CACHED_MODEL
     if _CACHED_MODEL is not None:
@@ -96,9 +89,7 @@ def _load_model_once():
     return model
 
 
-# ============================================================
-# 4. MULTIHEAD -> SINGLE CLASS MAPPING
-# ============================================================
+
 def _multihead_to_single_class(type_pred, color_pred):
     
     if type_pred == 6 or color_pred == 2:
@@ -110,9 +101,6 @@ def _multihead_to_single_class(type_pred, color_pred):
     return 12
 
 
-# ============================================================
-# 5. REQUIRED API FUNCTION
-# ============================================================
 def predict_board(image: np.ndarray, use_tta=True) -> torch.Tensor:
     """
     Predict an 8x8 chessboard using Test Time Augmentation (TTA).
@@ -142,7 +130,7 @@ def predict_board(image: np.ndarray, use_tta=True) -> torch.Tensor:
 
     with torch.no_grad():
         for sq_img, _ in squares:
-            # 1. Prepare Batch of Augmented Images
+            # Prepare Batch of Augmented Images
             img_orig = base_transform(sq_img)
             
             if use_tta:
@@ -157,10 +145,9 @@ def predict_board(image: np.ndarray, use_tta=True) -> torch.Tensor:
             else:
                 batch = img_orig.unsqueeze(0).to(_DEVICE)
 
-            # 2. Predict Batch
+            # Predict Batch
             pred_t, pred_c, _ = model(batch)
 
-            # 3. Average the Logits (Raw Scores)
             # We average the "votes" from all 3 versions
             avg_t = torch.mean(pred_t, dim=0, keepdim=True)
             avg_c = torch.mean(pred_c, dim=0, keepdim=True)
@@ -206,23 +193,23 @@ def test_accuracy(source="test_data_set", gt="gt.csv"):
                 p_val = pred_board[r, c].item()
                 g_val = FEN[r][c]
 
-                # 1. Total Success
+                # Total Success
                 if p_val == g_val:
                     success += 1
 
-                # 2. Type Success (Strict Empty Check)
+                # Type Success 
                 is_empty_correct = (p_val == 12 and g_val == 12)
                 is_piece_type_correct = (p_val != 12 and g_val != 12 and p_val % 6 == g_val % 6)
                 if is_empty_correct or is_piece_type_correct:
                     type_success += 1
 
-                # 3. Color Success
+                #Color Success
                 if p_val // 6 == g_val // 6:
                     col_success += 1
 
                 total += 1
 
-                # 4. Collect data for matrices
+
                 # Add Ground Truth to lists
                 if g_val == 12:
                     rc.append(2); rt.append(6)  # Map Empty to separate index
@@ -248,7 +235,7 @@ def test_accuracy(source="test_data_set", gt="gt.csv"):
         )
 
 
-#Plots two confusion matrices. Used for piece tyoe and color
+#Plots two confusion matrices. Used for piece type and color
 def plot_two_confusions(real_pred_1, actual_1,
                         real_pred_2, actual_2,
                         labels_1=None,
@@ -313,24 +300,9 @@ def print_board(pred_board):
         print(row_str)
                     
 
-# ==========================================
-classes_to_names = {0:"white pawn",1:"white rook",2:"white knight",3:"white bishop",4:"white queen",5:"white king",6:"black pawn",7:"black rook",8:"black knight",9:"black bishop",10:"black queen",11:"black king",12:"empty square", 13:"out of distribution"}
-classes_to_unicode = {
-    0: "♙",  # white pawn
-    1: "♖",  # white rook
-    2: "♘",  # white knight
-    3: "♗",  # white bishop
-    4: "♕",  # white queen
-    5: "♔",  # white king
-    6: "♟",  # black pawn
-    7: "♜",  # black rook
-    8: "♞",  # black knight
-    9: "♝",  # black bishop
-    10: "♛", # black queen
-    11: "♚", # black king
-    12: " ",  # empty square
-    13: "?"   # out of distribution
-}
+
+
+
 classes_to_letter = {
     0: "P",  # white pawn
     1: "R",  # white rook
@@ -348,7 +320,7 @@ classes_to_letter = {
     13: "?"   # out of distribution
 }
 
-# ==========================================
+
 parser = argparse.ArgumentParser(epilog="Use predtict_multihead_triplet.py --path your_image.jpg to test a single image, or --test True to run on the whole test set and get accuracys")
 if __name__ == "__main__":
     # Simple test

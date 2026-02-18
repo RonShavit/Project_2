@@ -3,11 +3,11 @@ import os
 import shutil
 import glob
 
-# ================= CONFIGURATION =================
-# 1. List your game folders exactly as they are named
+# =Configuration
+
 GAME_FOLDERS = ["game_2", "game_4", "game_5", "game_6", "game_7"]
 
-# 2. Define the Output Folder (The one the training code will read)
+
 OUTPUT_DIR = "real_data_pack"
 OUTPUT_IMG_DIR = os.path.join(OUTPUT_DIR, "images")
 OUTPUT_CSV = os.path.join(OUTPUT_DIR, "real_gt.csv")
@@ -21,15 +21,15 @@ def process_games():
     final_data = []
     total_images_processed = 0
 
-    print(f"--- Starting Processing for {len(GAME_FOLDERS)} Games ---")
+    print(f"-Starting Processing Games")
 
     for game_name in GAME_FOLDERS:
-        print(f"\n📂 Processing {game_name}...")
+        print(f"\nProcessing {game_name}")
         
-        # 1. Find the CSV file inside the game folder
+        #Find the CSV file inside the game folder
         csv_path = glob.glob(os.path.join(game_name, "*.csv"))
         if not csv_path:
-            print(f"   ⚠️ WARNING: No CSV found in {game_name}. Skipping.")
+            print(f"WARNING: No CSV found in {game_name}")
             continue
         
         # Read the raw CSV
@@ -37,17 +37,15 @@ def process_games():
         try:
             df = pd.read_csv(csv_path[0])
         except Exception as e:
-            print(f"   ❌ Error reading CSV: {e}")
             continue
 
-        # 2. Iterate through the CSV rows
+        #Iterate through the CSV rows
         images_in_game = 0
         for index, row in df.iterrows():
             fen = row['fen']
             frame_num = int(row['to_frame'])
             
             # Construct the filename as it appears in the folder (e.g., frame_000200)
-            # We check for both .jpg and .png just to be safe
             base_filename = f"frame_{frame_num:06d}" 
             
             # Look for the file in the 'images' subfolder
@@ -66,7 +64,7 @@ def process_games():
                     extension = os.path.splitext(p)[1] # Get .jpg or .png
                     break
             
-            # 3. IF FILE EXISTS (Meaning you didn't delete it) -> Process it
+            # IF FILE EXISTS 
             if src_path:
                 # Create a unique name: "game_2_frame_000200.jpg"
                 new_filename = f"{game_name}_{base_filename}{extension}"
@@ -75,29 +73,26 @@ def process_games():
                 # Copy the image
                 shutil.copy2(src_path, dst_path)
                 
-                # Add to our list for the Master CSV
+                # Add to list for the Master CSV
                 # Columns: image_name, FEN, View_specification
                 final_data.append([new_filename, fen, "white"])
                 
                 images_in_game += 1
                 total_images_processed += 1
             
-            # If src_path is None, it means you deleted the photo manually.
-            # The script simply ignores it.
 
-        print(f"   ✅ Collected {images_in_game} valid images.")
 
-    # ================= SAVE MASTER CSV =================
+
+
+    # SAVE MASTER CSV 
     if final_data:
-        # Create DataFrame with the exact headers required
+        # Create DataFrame 
         final_df = pd.DataFrame(final_data, columns=['image_name', 'FEN', 'View_specification'])
         
         final_df.to_csv(OUTPUT_CSV, index=False)
-        print(f"\n🎉 DONE! Processed {total_images_processed} images total.")
-        print(f"📁 Output saved to: {OUTPUT_DIR}")
-        print(f"📄 Master CSV: {OUTPUT_CSV}")
+        print(f"Output saved to: {OUTPUT_DIR}")
     else:
-        print("\n❌ Error: No images were found. Check your folder names.")
+        print("\nError: No images were found")
 
 if __name__ == "__main__":
     process_games()
