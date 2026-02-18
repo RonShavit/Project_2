@@ -24,8 +24,5 @@ matplotlib
 seaborn
 scikit-learn
 tqdm
-random
-sys
-os
 argparse
-cv2
+
