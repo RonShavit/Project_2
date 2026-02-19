@@ -1,8 +1,16 @@
 **To set up:**
 
->run
+>to create a new virtual environment run
 
->>`source venv/bin/activate`
+>>`python -m venv venv`
+
+>>`source venv/bin/activate` (on linux/MacOs) /
+>>`source venv/Scripts/activate` (on Microsoft - git bash) /
+>>`venv\Scripts\Activate.ps1` (on Microsoft - Powershell)
+
+
+
+>to install requirements run
 
 >>`pip install -r requirements.txt`
 
@@ -70,11 +78,11 @@
     |
     |-experiment_base_optimized
         |
-        |-multihead_model.pth
+        |-multihead_model.pth - (these are the weights for the Zero-shot [not fine tuned] model)
     |
     |-experiment_base_optimized_finetuned
         |
-        |-finetuned_multihead.pth
+        |-finetuned_multihead.pth - (these are the weights for the fine-tuned model)
     |
     |-chess_dataset.py
     |
@@ -104,27 +112,27 @@
 
 `python preprocess_mix.py`
 
-`python train_multihead_triplet.py --epochs 15 --batch 256 --output experiment_base_optimized`
+`python train_multihead_triplet.py --epochs 15 --batch 256 --output experiment_base_optimized`  (NOTE : this will overwrite the weights saved in `experiment_base_optimized\multihead_model.pth`. To preserve the weights, move or rename `multihead_model.pth` bedore running this line)
 
-`python fine_tune_multihead_triplet_v2.py --source experiment_base_optimized`
+`python fine_tune_multihead_triplet_v2.py --source experiment_base_optimized` (NOTE : this will overwrite the weights saved in `experiment_base_optimized_finetuned\finetuned_multihead.pth`. To preserve the weights, move or rename `finetuned_multihead.pth` bedore running this line)
 
-**To predict a single numpy.ndarry image**
-**use:**
+**To predict a single numpy.ndarry image:**
 
-`from predict_multihead_triplet import predict_board`
-run `predict_board(ndarray)`
+>add the import line `from predict_multihead_triplet import predict_board`
+
+>with "image" as a ndarray file run `predict_board(image)` to predict the board in "image"
 
 >the return value is a torch.tensor
 
-**To predict an image file**
+**To predict an image file run:**
 
-run `python predict_multihead_triplet.py --path *your image path*`
+`python predict_multihead_triplet.py --path *your image path*`
 
 >this will print the preditction to the console
 
-**To test accuracy**
+**To test accuracy run:**
 
-run `python predict_multihead_triplet.py --test 1`
+`python predict_multihead_triplet.py --test 1`
 
 >this will print accuracy test results preformed on real_data_set/test
 
@@ -140,5 +148,5 @@ run `python predict_multihead_triplet.py --test 1`
 
 **To plot confusion matrices**
 
-add `--plot_path *output_path.jpg*` when running `predict_multiheadtriplt.py`. The matrices will be plotted to the given path
+add `--plot_path *output_path.jpg*` when running `predict_multiheadtriplt.py`. The matrices will be plotted to the given path (both piece type and color confusion matrices will be plotted, along with their respective accuracies)
 
